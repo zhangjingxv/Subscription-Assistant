@@ -1,0 +1,1076 @@
+openapi: 3.0.3
+info:
+  title: AttentionSync API
+  description: |
+    开源智能信息聚合平台API
+    
+    ## 核心功能
+    - 多源信息采集与同步
+    - AI驱动的内容摘要与聚类
+    - 个性化推荐与3分钟日读
+    - 全文搜索与知识管理
+    
+    ## 认证方式
+    使用Bearer Token认证，在请求头中添加：
+    ```
+    Authorization: Bearer <your-token>
+    ```
+  version: 1.0.0
+  contact:
+    name: AttentionSync Team
+    url: https://github.com/attentionsync/attentionsync
+    email: support@attentionsync.io
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development server
+  - url: https://api.attentionsync.io/v1
+    description: Production server
+
+tags:
+  - name: Auth
+    description: 用户认证与授权
+  - name: Sources
+    description: 信息源管理
+  - name: Items
+    description: 内容项管理
+  - name: Summaries
+    description: 摘要生成与管理
+  - name: Daily
+    description: 每日摘要与3分钟日读
+  - name: Search
+    description: 搜索与发现
+  - name: Collections
+    description: 收藏夹管理
+  - name: Preferences
+    description: 用户偏好设置
+  - name: Analytics
+    description: 数据分析与统计
+
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: 用户注册
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, username, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 30
+                  example: johndoe
+                password:
+                  type: string
+                  minLength: 8
+                  example: SecurePass123!
+                full_name:
+                  type: string
+                  example: John Doe
+      responses:
+        201:
+          description: 注册成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        409:
+          description: 用户已存在
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: 用户登录
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  description: 邮箱或用户名
+                  example: user@example.com
+                password:
+                  type: string
+                  example: SecurePass123!
+      responses:
+        200:
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+
+  /sources:
+    get:
+      tags: [Sources]
+      summary: 获取用户的信息源列表
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [rss, api, webhook, manual]
+        - name: platform
+          in: query
+          schema:
+            type: string
+            enum: [wechat, bilibili, youtube, x, weibo, zhihu]
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sources:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Source'
+                  total:
+                    type: integer
+
+    post:
+      tags: [Sources]
+      summary: 添加新的信息源
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SourceCreate'
+      responses:
+        201:
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Source'
+
+  /sources/{source_id}:
+    parameters:
+      - name: source_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    
+    get:
+      tags: [Sources]
+      summary: 获取信息源详情
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Source'
+        404:
+          $ref: '#/components/responses/NotFound'
+    
+    patch:
+      tags: [Sources]
+      summary: 更新信息源
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SourceUpdate'
+      responses:
+        200:
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Source'
+    
+    delete:
+      tags: [Sources]
+      summary: 删除信息源
+      security:
+        - bearerAuth: []
+      responses:
+        204:
+          description: 删除成功
+
+  /sources/{source_id}/sync:
+    post:
+      tags: [Sources]
+      summary: 手动触发信息源同步
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: source_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        202:
+          description: 同步任务已创建
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  task_id:
+                    type: string
+                  status:
+                    type: string
+                    enum: [pending, processing, completed, failed]
+
+  /items:
+    get:
+      tags: [Items]
+      summary: 获取内容项列表
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: source_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: content_type
+          in: query
+          schema:
+            type: string
+            enum: [article, video, audio, image]
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        200:
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Item'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /items/{item_id}:
+    get:
+      tags: [Items]
+      summary: 获取内容项详情
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: item_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemDetail'
+
+  /items/{item_id}/summary:
+    post:
+      tags: [Summaries]
+      summary: 生成内容摘要
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: item_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                model:
+                  type: string
+                  enum: [claude-3-sonnet, gpt-4o-mini, local]
+                  default: claude-3-sonnet
+                max_length:
+                  type: integer
+                  default: 200
+                  description: 摘要最大字数
+                language:
+                  type: string
+                  enum: [zh, en, auto]
+                  default: auto
+      responses:
+        200:
+          description: 摘要生成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Summary'
+        202:
+          description: 摘要生成中（异步）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  task_id:
+                    type: string
+
+  /daily:
+    get:
+      tags: [Daily]
+      summary: 获取今日摘要（3分钟日读）
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: 默认为今天
+      responses:
+        200:
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyDigest'
+
+  /daily/generate:
+    post:
+      tags: [Daily]
+      summary: 生成每日摘要
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: string
+                  format: date
+                force_regenerate:
+                  type: boolean
+                  default: false
+      responses:
+        201:
+          description: 生成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyDigest'
+
+  /search:
+    get:
+      tags: [Search]
+      summary: 全文搜索
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 搜索关键词
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [keyword, semantic]
+          default: keyword
+        - name: filters
+          in: query
+          style: deepObject
+          explode: true
+          schema:
+            type: object
+            properties:
+              content_type:
+                type: array
+                items:
+                  type: string
+              date_from:
+                type: string
+                format: date
+              date_to:
+                type: string
+                format: date
+              sources:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        200:
+          description: 搜索结果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SearchResult'
+                  total:
+                    type: integer
+                  took_ms:
+                    type: number
+
+  /collections:
+    get:
+      tags: [Collections]
+      summary: 获取收藏夹列表
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  collections:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Collection'
+
+    post:
+      tags: [Collections]
+      summary: 创建收藏夹
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                description:
+                  type: string
+                is_public:
+                  type: boolean
+                  default: false
+      responses:
+        201:
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+
+  /collections/{collection_id}/items:
+    post:
+      tags: [Collections]
+      summary: 添加内容到收藏夹
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: collection_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [item_id]
+              properties:
+                item_id:
+                  type: string
+                  format: uuid
+                note:
+                  type: string
+      responses:
+        201:
+          description: 添加成功
+
+  /preferences:
+    get:
+      tags: [Preferences]
+      summary: 获取用户偏好设置
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preferences'
+
+    put:
+      tags: [Preferences]
+      summary: 更新用户偏好设置
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreferencesUpdate'
+      responses:
+        200:
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preferences'
+
+  /analytics/stats:
+    get:
+      tags: [Analytics]
+      summary: 获取用户统计数据
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [day, week, month, year]
+          default: week
+      responses:
+        200:
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStats'
+
+  /webhooks/callback:
+    post:
+      tags: [Sources]
+      summary: Webhook回调接口
+      parameters:
+        - name: X-Webhook-Secret
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          description: 接收成功
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    
+    LimitParam:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  schemas:
+    AuthResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        token_type:
+          type: string
+          default: Bearer
+        expires_in:
+          type: integer
+          description: Token过期时间（秒）
+        user:
+          $ref: '#/components/schemas/User'
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+        full_name:
+          type: string
+        avatar_url:
+          type: string
+        language:
+          type: string
+        timezone:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    Source:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+          enum: [rss, api, webhook, manual]
+        platform:
+          type: string
+        url:
+          type: string
+        is_active:
+          type: boolean
+        last_fetched_at:
+          type: string
+          format: date-time
+        error_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    SourceCreate:
+      type: object
+      required: [name, type]
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [rss, api, webhook, manual]
+        platform:
+          type: string
+        url:
+          type: string
+        config:
+          type: object
+        fetch_frequency:
+          type: integer
+          minimum: 300
+          default: 3600
+
+    SourceUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        is_active:
+          type: boolean
+        fetch_frequency:
+          type: integer
+        config:
+          type: object
+
+    Item:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        source_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        author:
+          type: string
+        content_type:
+          type: string
+          enum: [article, video, audio, image]
+        url:
+          type: string
+        published_at:
+          type: string
+          format: date-time
+        has_summary:
+          type: boolean
+        summary_preview:
+          type: string
+          maxLength: 100
+
+    ItemDetail:
+      allOf:
+        - $ref: '#/components/schemas/Item'
+        - type: object
+          properties:
+            raw_content:
+              type: string
+            media_url:
+              type: string
+            transcript:
+              $ref: '#/components/schemas/Transcript'
+            summary:
+              $ref: '#/components/schemas/Summary'
+            metadata:
+              type: object
+
+    Transcript:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        language:
+          type: string
+        text:
+          type: string
+        segments:
+          type: array
+          items:
+            type: object
+            properties:
+              start:
+                type: number
+              end:
+                type: number
+              text:
+                type: string
+        duration:
+          type: integer
+        model:
+          type: string
+
+    Summary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        summary:
+          type: string
+        key_points:
+          type: array
+          items:
+            type: string
+        entities:
+          type: object
+          properties:
+            people:
+              type: array
+              items:
+                type: string
+            organizations:
+              type: array
+              items:
+                type: string
+            locations:
+              type: array
+              items:
+                type: string
+        tags:
+          type: array
+          items:
+            type: string
+        quality_score:
+          type: number
+          minimum: 0
+          maximum: 1
+        created_at:
+          type: string
+          format: date-time
+
+    DailyDigest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date
+        clusters:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              name:
+                type: string
+              description:
+                type: string
+              items:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    item:
+                      $ref: '#/components/schemas/Item'
+                    score:
+                      type: number
+                    reason:
+                      type: string
+        total_items:
+          type: integer
+        estimated_reading_time:
+          type: integer
+          description: 预计阅读时间（秒）
+        generated_at:
+          type: string
+          format: date-time
+
+    SearchResult:
+      type: object
+      properties:
+        item:
+          $ref: '#/components/schemas/Item'
+        score:
+          type: number
+        highlights:
+          type: array
+          items:
+            type: string
+
+    Collection:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        is_public:
+          type: boolean
+        item_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Preferences:
+      type: object
+      properties:
+        keywords:
+          type: array
+          items:
+            type: string
+        blocked_keywords:
+          type: array
+          items:
+            type: string
+        preferred_sources:
+          type: array
+          items:
+            type: string
+            format: uuid
+        blocked_sources:
+          type: array
+          items:
+            type: string
+            format: uuid
+        reading_time_slots:
+          type: array
+          items:
+            type: object
+            properties:
+              start:
+                type: string
+                pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9]$'
+              end:
+                type: string
+                pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9]$'
+        notification_settings:
+          type: object
+          properties:
+            daily_digest:
+              type: boolean
+            important_updates:
+              type: boolean
+            weekly_report:
+              type: boolean
+        personalization_enabled:
+          type: boolean
+        auto_archive_days:
+          type: integer
+        theme:
+          type: string
+          enum: [light, dark, auto]
+
+    PreferencesUpdate:
+      $ref: '#/components/schemas/Preferences'
+
+    UserStats:
+      type: object
+      properties:
+        period:
+          type: string
+        items_read:
+          type: integer
+        items_saved:
+          type: integer
+        reading_time:
+          type: integer
+          description: 总阅读时间（秒）
+        avg_daily_items:
+          type: number
+        top_sources:
+          type: array
+          items:
+            type: object
+            properties:
+              source:
+                $ref: '#/components/schemas/Source'
+              count:
+                type: integer
+        top_tags:
+          type: array
+          items:
+            type: object
+            properties:
+              tag:
+                type: string
+              count:
+                type: integer
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        total_pages:
+          type: integer
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    Unauthorized:
+      description: 未认证
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    Forbidden:
+      description: 无权限
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    InternalError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
