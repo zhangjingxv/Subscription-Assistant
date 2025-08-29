@@ -1,0 +1,254 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 数据库
+  postgres:
+    image: postgres:15-alpine
+    container_name: attentionsync-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-attentionsync}
+      POSTGRES_USER: ${POSTGRES_USER:-attentionsync}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C.UTF-8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/schemas.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-attentionsync}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - attentionsync-network
+
+  # Redis 缓存和队列
+  redis:
+    image: redis:7-alpine
+    container_name: attentionsync-redis
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - attentionsync-network
+
+  # MinIO 对象存储（S3兼容）
+  minio:
+    image: minio/minio:latest
+    container_name: attentionsync-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      MINIO_DEFAULT_BUCKETS: ${MINIO_DEFAULT_BUCKETS:-attentionsync}
+    volumes:
+      - minio_data:/data
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - attentionsync-network
+
+  # API 服务
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: attentionsync-api
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-attentionsync}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-attentionsync}
+      REDIS_URL: redis://redis:6379/0
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      MINIO_BUCKET: ${MINIO_DEFAULT_BUCKETS:-attentionsync}
+      SECRET_KEY: ${SECRET_KEY:-your-secret-key-here}
+      JWT_SECRET: ${JWT_SECRET:-your-jwt-secret-here}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      WHISPER_MODEL: ${WHISPER_MODEL:-base}
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - ./api:/app
+      - ./prompts:/app/prompts:ro
+    ports:
+      - "${API_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - attentionsync-network
+    restart: unless-stopped
+
+  # Worker 服务（Celery）
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    container_name: attentionsync-worker
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-attentionsync}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-attentionsync}
+      REDIS_URL: redis://redis:6379/0
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      WHISPER_MODEL: ${WHISPER_MODEL:-base}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - ./worker:/app
+      - ./prompts:/app/prompts:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - attentionsync-network
+    restart: unless-stopped
+
+  # Celery Beat 调度器
+  scheduler:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    container_name: attentionsync-scheduler
+    command: celery -A app.celery beat --loglevel=info
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-attentionsync}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-attentionsync}
+      REDIS_URL: redis://redis:6379/0
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - ./worker:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - attentionsync-network
+    restart: unless-stopped
+
+  # Web 前端
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    container_name: attentionsync-web
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-ws://localhost:8000}
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    depends_on:
+      - api
+    networks:
+      - attentionsync-network
+    restart: unless-stopped
+
+  # Nginx 反向代理（生产环境）
+  nginx:
+    image: nginx:alpine
+    container_name: attentionsync-nginx
+    volumes:
+      - ./infra/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infra/ssl:/etc/nginx/ssl:ro
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    depends_on:
+      - api
+      - web
+    networks:
+      - attentionsync-network
+    profiles:
+      - production
+    restart: unless-stopped
+
+  # Prometheus 监控（可选）
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: attentionsync-prometheus
+    volumes:
+      - ./infra/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    networks:
+      - attentionsync-network
+    profiles:
+      - monitoring
+    restart: unless-stopped
+
+  # Grafana 可视化（可选）
+  grafana:
+    image: grafana/grafana:latest
+    container_name: attentionsync-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_INSTALL_PLUGINS: redis-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./infra/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./infra/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - attentionsync-network
+    profiles:
+      - monitoring
+    restart: unless-stopped
+
+networks:
+  attentionsync-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  minio_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
