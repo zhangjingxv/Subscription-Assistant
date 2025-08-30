@@ -26,24 +26,43 @@ AttentionSync 是一款开源的智能信息聚合平台，通过AI技术自动�
 
 ## 🚀 快速开始
 
-### 使用 Docker Compose（推荐）
+### 🎉 项目已可运行！
+
+AttentionSync 现在已经是一个完全可运行的智能信息聚合平台！
+
+#### 一键启动 (推荐)
 
 ```bash
-# 克隆项目
-git clone https://github.com/attentionsync/attentionsync.git
-cd attentionsync
+# 运行快速启动脚本
+./scripts/start.sh
 
-# 复制环境变量配置
+# 或者启动开发环境
+./scripts/dev-start.sh
+```
+
+#### 手动启动
+
+```bash
+# 1. 复制环境配置
 cp .env.example .env
 
-# 编辑 .env 文件，配置必要的API密钥
+# 2. 编辑配置文件 (必须添加AI API密钥)
 nano .env
 
-# 启动服务
-docker-compose up -d
+# 3. 启动服务
+docker compose up -d
 
-# 访问 http://localhost:3000
+# 4. 初始化数据库
+cd api && python ../scripts/init_db.py
+
+# 5. 访问应用
+# 前端: http://localhost:3000
+# API: http://localhost:8000/docs
 ```
+
+#### 💡 演示账号
+- 邮箱: `admin@attentionsync.io`
+- 密码: `admin123`
 
 ### 本地开发环境
 

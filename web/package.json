@@ -1,0 +1,81 @@
+{
+  "name": "attentionsync-web",
+  "version": "1.0.0",
+  "description": "AttentionSync Web Frontend - Intelligent Information Aggregation Platform",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "dependencies": {
+    "next": "14.0.4",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "@types/node": "20.10.4",
+    "@types/react": "18.2.45",
+    "@types/react-dom": "18.2.18",
+    "typescript": "5.3.3",
+    "tailwindcss": "3.3.6",
+    "autoprefixer": "10.4.16",
+    "postcss": "8.4.32",
+    "@tailwindcss/forms": "0.5.7",
+    "@tailwindcss/typography": "0.5.10",
+    "@headlessui/react": "1.7.17",
+    "@heroicons/react": "2.0.18",
+    "clsx": "2.0.0",
+    "framer-motion": "10.16.16",
+    "zustand": "4.4.7",
+    "react-query": "3.39.3",
+    "@tanstack/react-query": "5.12.2",
+    "axios": "1.6.2",
+    "date-fns": "2.30.0",
+    "react-hot-toast": "2.4.1",
+    "react-intersection-observer": "9.5.3",
+    "react-infinite-scroll-component": "6.1.0",
+    "react-markdown": "9.0.1",
+    "remark-gfm": "4.0.0",
+    "rehype-highlight": "7.0.0",
+    "lucide-react": "0.294.0"
+  },
+  "devDependencies": {
+    "eslint": "8.55.0",
+    "eslint-config-next": "14.0.4",
+    "@typescript-eslint/eslint-plugin": "6.13.2",
+    "@typescript-eslint/parser": "6.13.2",
+    "prettier": "3.1.1",
+    "prettier-plugin-tailwindcss": "0.5.7",
+    "jest": "29.7.0",
+    "@testing-library/react": "14.1.2",
+    "@testing-library/jest-dom": "6.1.5",
+    "jest-environment-jsdom": "29.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": [
+    "information-aggregation",
+    "ai-summary",
+    "rss-reader",
+    "content-curation",
+    "nextjs",
+    "typescript"
+  ],
+  "author": "AttentionSync Team",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/attentionsync/attentionsync.git"
+  },
+  "bugs": {
+    "url": "https://github.com/attentionsync/attentionsync/issues"
+  },
+  "homepage": "https://attentionsync.io"
+}
