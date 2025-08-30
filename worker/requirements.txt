@@ -1,0 +1,8 @@
+# Same as API requirements for worker processes
+-r ../api/requirements.txt
+
+# Additional worker-specific packages
+youtube-dl==2021.12.17
+yt-dlp==2023.11.16
+selenium==4.15.2
+webdriver-manager==4.0.1
