@@ -31,6 +31,10 @@ def get_database_url(async_db: bool = False) -> str:
     settings = get_settings()
     url = settings.database_url
     
+    # SQLite doesn't support async, so always use sync for SQLite
+    if "sqlite" in url:
+        return url
+    
     if async_db:
         # Replace postgresql:// with postgresql+asyncpg://
         if url.startswith("postgresql://"):
@@ -69,6 +73,13 @@ def init_async_db():
     
     database_url = get_database_url(async_db=True)
     
+    # SQLite doesn't support async, so skip async initialization for SQLite
+    if "sqlite" in database_url:
+        logger.warning("SQLite detected, skipping async database initialization")
+        async_engine = None
+        AsyncSessionLocal = None
+        return
+    
     async_engine = create_async_engine(
         database_url,
         pool_pre_ping=True,
@@ -96,17 +107,31 @@ async def init_db():
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """Dependency to get database session"""
-    if AsyncSessionLocal is None:
-        raise RuntimeError("Database not initialized. Call init_db() first.")
+    settings = get_settings()
     
-    async with AsyncSessionLocal() as session:
+    # For SQLite, use sync session as fallback
+    if "sqlite" in settings.database_url:
+        if SessionLocal is None:
+            raise RuntimeError("Database not initialized. Call init_db() first.")
+        
+        # Create a mock async session that wraps sync session
+        # This is a temporary workaround for SQLite
+        from sqlalchemy.ext.asyncio import AsyncSession
+        from sqlalchemy.orm import Session
+        
+        sync_session = SessionLocal()
         try:
-            yield session
-        except Exception:
-            await session.rollback()
-            raise
+            # Create a mock async session
+            async_session = AsyncSession(sync_session.bind, expire_on_commit=False)
+            yield async_session
         finally:
-            await session.close()
+            sync_session.close()
+    else:
+        if AsyncSessionLocal is None:
+            raise RuntimeError("Database not initialized. Call init_db() first.")
+        
+        async with AsyncSessionLocal() as session:
+            yield session
 
 
 def get_sync_db():

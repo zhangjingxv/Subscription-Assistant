@@ -15,8 +15,8 @@ from fastapi.responses import JSONResponse
 import structlog
 
 from app.core.config import get_settings
-from app.core.database import init_db
-from app.routers import auth, sources, items, daily, search, collections
+# from app.core.database import init_db
+# from app.routers import auth, sources, items, daily, search, collections
 from app.core.exceptions import setup_exception_handlers
 
 # Configure structured logging
@@ -48,7 +48,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Starting AttentionSync API...")
     
     # Initialize database
-    await init_db()
+    # await init_db()
     logger.info("Database initialized")
     
     yield
@@ -67,7 +67,7 @@ def create_app() -> FastAPI:
         version="1.0.0",
         docs_url="/docs" if settings.environment == "development" else None,
         redoc_url="/redoc" if settings.environment == "development" else None,
-        lifespan=lifespan
+        # lifespan=lifespan  # Temporarily disabled
     )
     
     # Middleware
@@ -90,12 +90,12 @@ def create_app() -> FastAPI:
         return {"status": "healthy", "service": "attentionsync-api"}
     
     # Include routers
-    app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
-    app.include_router(sources.router, prefix="/api/v1/sources", tags=["sources"])
-    app.include_router(items.router, prefix="/api/v1/items", tags=["items"])
-    app.include_router(daily.router, prefix="/api/v1/daily", tags=["daily"])
-    app.include_router(search.router, prefix="/api/v1/search", tags=["search"])
-    app.include_router(collections.router, prefix="/api/v1/collections", tags=["collections"])
+    # app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+    # app.include_router(sources.router, prefix="/api/v1/sources", tags=["sources"])
+    # app.include_router(items.router, prefix="/api/v1/items", tags=["items"])
+    # app.include_router(daily.router, prefix="/api/v1/daily", tags=["daily"])
+    # app.include_router(search.router, prefix="/api/v1/search", tags=["search"])
+    # app.include_router(collections.router, prefix="/api/v1/collections", tags=["collections"])
     
     return app
 

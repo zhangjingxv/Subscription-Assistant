@@ -6,7 +6,7 @@ import os
 from functools import lru_cache
 from typing import List, Optional
 
-from pydantic import Field, validator
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
@@ -20,21 +20,21 @@ class Settings(BaseSettings):
     log_level: str = Field(default="INFO", env="LOG_LEVEL")
     
     # Security
-    secret_key: str = Field(..., env="SECRET_KEY")
-    jwt_secret: str = Field(..., env="JWT_SECRET")
+    secret_key: str = Field(default="your-secret-key-here", env="SECRET_KEY")
+    jwt_secret: str = Field(default="your-jwt-secret-here", env="JWT_SECRET")
     jwt_algorithm: str = Field(default="HS256", env="JWT_ALGORITHM")
     jwt_expire_minutes: int = Field(default=1440, env="JWT_EXPIRE_MINUTES")  # 24 hours
     
     # Database
-    database_url: str = Field(..., env="DATABASE_URL")
+    database_url: str = Field(default="sqlite:///./attentionsync.db", env="DATABASE_URL")
     
     # Redis
-    redis_url: str = Field(..., env="REDIS_URL")
+    redis_url: str = Field(default="redis://localhost:6379/0", env="REDIS_URL")
     
     # MinIO Object Storage
-    minio_endpoint: str = Field(..., env="MINIO_ENDPOINT")
-    minio_access_key: str = Field(..., env="MINIO_ROOT_USER")
-    minio_secret_key: str = Field(..., env="MINIO_ROOT_PASSWORD")
+    minio_endpoint: str = Field(default="localhost:9000", env="MINIO_ENDPOINT")
+    minio_access_key: str = Field(default="minioadmin", env="MINIO_ROOT_USER")
+    minio_secret_key: str = Field(default="minioadmin", env="MINIO_ROOT_PASSWORD")
     minio_bucket: str = Field(default="attentionsync", env="MINIO_DEFAULT_BUCKETS")
     minio_secure: bool = Field(default=False)
     
@@ -61,20 +61,9 @@ class Settings(BaseSettings):
         env="ALLOWED_ORIGINS"
     )
     
-    @validator("allowed_origins", pre=True)
-    def parse_cors_origins(cls, v):
-        if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",")]
-        return v
-    
-    @validator("anthropic_api_key", "openai_api_key")
-    def validate_ai_keys(cls, v, field):
-        if not v:
-            print(f"Warning: {field.name} not provided. AI features will be limited.")
-        return v
-    
     class Config:
         env_file = ".env"
+        env_file_encoding = "utf-8"
         case_sensitive = False
 
 

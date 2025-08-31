@@ -29,7 +29,7 @@ class UserPreference(BaseModel):
     negative_interactions = Column(Integer, default=0, nullable=False)  # skips, dislikes
     
     # Additional metadata
-    metadata = Column(JSON, default=dict, nullable=False)
+    preference_metadata = Column(JSON, default=dict, nullable=False)
     
     # Indexes for efficient querying
     __table_args__ = (
