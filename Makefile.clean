@@ -16,9 +16,9 @@ help:
 
 # Install dependencies - minimal by default
 install:
-	pip install --user --break-system-packages -q fastapi uvicorn sqlalchemy python-dotenv pydantic
+	pip install -q fastapi uvicorn sqlalchemy python-dotenv pydantic
 	@echo "✓ Core dependencies installed"
-	@echo "Optional: pip install --user openai anthropic redis (for extra features)"
+	@echo "Optional: pip install openai anthropic redis (for extra features)"
 
 # Run the application - simple and direct
 run:
