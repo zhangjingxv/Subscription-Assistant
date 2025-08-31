@@ -4,6 +4,7 @@
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](https://www.python.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-green)](https://www.docker.com/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
+[![Project Status](https://img.shields.io/badge/Status-75%25%20Complete-orange)](https://github.com/zhangjingxv/Subscription-Assistant)
 
 > 让每个人用3分钟掌握一天的关键信息，永不错过重要机会。
 
@@ -18,11 +19,16 @@ AttentionSync 是一款开源的智能信息聚合平台，通过AI技术自动�
 - 🚀 **高性能**：分布式架构，支持大规模信息处理
 - 🎨 **现代UI**：响应式设计，支持深色模式，多端适配
 
-## 📸 产品截图
+## 📊 项目状态
 
-| 3分钟日读 | 信息源管理 | 搜索发现 |
-|---------|----------|---------|
-| ![Daily](docs/images/daily.png) | ![Sources](docs/images/sources.png) | ![Search](docs/images/search.png) |
+**当前完成度: 75%** 🎯
+
+- ✅ **基础架构** (100%) - FastAPI后端、数据库模型、认证系统
+- ✅ **核心功能** (80%) - 用户管理、内容采集、AI处理
+- 🔄 **前端界面** (50%) - Next.js框架、基础组件
+- 🔄 **部署运维** (40%) - Docker化、环境配置
+
+详细状态请查看 [项目状态总结](PROJECT_STATUS_SUMMARY.md)
 
 ## 🚀 快速开始
 
@@ -43,203 +49,100 @@ AttentionSync 现在已经是一个完全可运行的智能信息聚合平台！
 #### 手动启动
 
 ```bash
-# 1. 复制环境配置
-cp .env.example .env
+# 1. 克隆项目
+git clone https://github.com/zhangjingxv/Subscription-Assistant.git
+cd Subscription-Assistant
 
-# 2. 编辑配置文件 (必须添加AI API密钥)
-nano .env
+# 2. 安装Python依赖
+cd api
+pip install -r requirements.txt
 
-# 3. 启动服务
-docker compose up -d
+# 3. 启动API服务
+python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8001
 
-# 4. 初始化数据库
-cd api && python ../scripts/init_db.py
-
-# 5. 访问应用
-# 前端: http://localhost:3000
-# API: http://localhost:8000/docs
+# 4. 访问应用
+# API: http://localhost:8001
+# 健康检查: http://localhost:8001/health
 ```
 
 #### 💡 演示账号
 - 邮箱: `admin@attentionsync.io`
 - 密码: `admin123`
 
-### 本地开发环境
+## 🔧 技术架构
 
-#### 前置要求
-- Python 3.11+
-- Node.js 18+
-- PostgreSQL 15+
-- Redis 7+
+### 后端技术栈
+- **框架**: FastAPI + Uvicorn
+- **数据库**: PostgreSQL + SQLite (开发)
+- **ORM**: SQLAlchemy 2.0
+- **缓存**: Redis
+- **AI服务**: OpenAI, Anthropic Claude
 
-#### 后端设置
+### 前端技术栈
+- **框架**: Next.js 14
+- **样式**: Tailwind CSS
+- **类型**: TypeScript
 
-```bash
-# 创建虚拟环境
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+### 基础设施
+- **容器化**: Docker + Docker Compose
+- **对象存储**: MinIO
+- **任务队列**: Celery
 
-# 安装依赖
-pip install -r requirements.txt
+## 📈 开发路线图
 
-# 初始化数据库
-python scripts/init_db.py
+### 🎯 短期目标 (1-2个月)
+- 完善错误处理和日志记录
+- 添加测试覆盖
+- 实现Redis缓存层
+- 优化数据库性能
 
-# 启动后端服务
-uvicorn api.main:app --reload --port 8000
-```
+### 🔮 中期目标 (3-6个月)
+- AI能力增强
+- 微服务架构改造
+- 搜索引擎集成
+- 性能优化
 
-#### 前端设置
+### 🌟 长期目标 (6-12个月)
+- 智能化升级
+- 平台化发展
+- 国际化支持
 
-```bash
-# 进入前端目录
-cd web
-
-# 安装依赖
-npm install
-
-# 启动开发服务器
-npm run dev
-
-# 访问 http://localhost:3000
-```
-
-## 📝 配置说明
-
-### 必需的环境变量
-
-```env
-# 数据库配置
-DATABASE_URL=postgresql://user:password@localhost:5432/attentionsync
-REDIS_URL=redis://localhost:6379/0
-
-# AI服务配置（至少配置一个）
-ANTHROPIC_API_KEY=your_claude_api_key  # 推荐
-OPENAI_API_KEY=your_openai_api_key     # 备选
-
-# 安全配置
-SECRET_KEY=your-secret-key-here
-JWT_SECRET=your-jwt-secret-here
-
-# 可选：音视频转写
-WHISPER_MODEL=base  # tiny, base, small, medium, large
-```
-
-### 高级配置
-
-查看 [配置文档](docs/configuration.md) 了解所有配置选项。
-
-## 🎯 使用指南
-
-### 1. 添加信息源
-
-```python
-# 通过Web界面
-访问 设置 > 信息源 > 添加新源
-
-# 通过API
-POST /api/v1/sources
-{
-  "name": "Hacker News",
-  "type": "rss",
-  "url": "https://news.ycombinator.com/rss"
-}
-```
-
-### 2. 查看每日摘要
-
-```python
-# 访问主页即可看到3分钟日读
-GET /api/v1/daily
-
-# 返回个性化排序的今日要闻
-```
-
-### 3. 搜索历史内容
-
-```python
-# 全文搜索
-GET /api/v1/search?q=人工智能
-
-# 语义搜索（需要配置向量数据库）
-GET /api/v1/search?q=AI发展趋势&type=semantic
-```
-
-## 🏗️ 系统架构
-
-```mermaid
-graph LR
-    A[数据源] --> B[采集器]
-    B --> C[消息队列]
-    C --> D[处理器]
-    D --> E[AI服务]
-    E --> F[数据库]
-    F --> G[API]
-    G --> H[前端]
-```
-
-详细架构说明请查看 [架构文档](docs/architecture.md)。
+详细规划请查看 [未来优化方向](FUTURE_OPTIMIZATION.md)
 
 ## 🤝 贡献指南
 
-我们欢迎所有形式的贡献！查看 [CONTRIBUTING.md](CONTRIBUTING.md) 了解如何开始。
+我们欢迎所有形式的贡献！
 
-### 开发路线图
+### 贡献方式
+- 🐛 **Bug报告**: 通过 [GitHub Issues](https://github.com/zhangjingxv/Subscription-Assistant/issues)
+- 💡 **功能建议**: 提交 Feature Request
+- 🔧 **代码贡献**: Fork + Pull Request
+- 📚 **文档改进**: 直接编辑或PR
 
-- [x] MVP版本发布
-- [x] 多语言支持
-- [ ] 移动端APP
-- [ ] 浏览器插件
-- [ ] 更多AI模型支持
-- [ ] 团队协作功能
+### 开发环境设置
+1. Fork 项目
+2. 克隆你的Fork: `git clone https://github.com/YOUR_USERNAME/Subscription-Assistant.git`
+3. 创建功能分支: `git checkout -b feature/amazing-feature`
+4. 提交更改: `git commit -m 'Add amazing feature'`
+5. 推送到分支: `git push origin feature/amazing-feature`
+6. 创建 Pull Request
 
-查看完整 [ROADMAP.md](ROADMAP.md)。
+## 📚 文档
 
-## 📊 性能指标
+- [📊 项目状态总结](PROJECT_STATUS_SUMMARY.md)
+- [🚀 未来优化方向](FUTURE_OPTIMIZATION.md)
+- [⚡ 快速启动指南](QUICK_START.md)
+- [📋 产品需求文档](docs/PRD.md)
+- [🛠️ 部署指南](DEPLOYMENT.md)
 
-| 指标 | 目标值 | 实际值 |
-|-----|--------|--------|
-| 页面加载时间 | <1.5s | 1.2s |
-| API响应时间 | <500ms | 380ms |
-| 摘要生成时间 | <10s | 7.5s |
-| 日处理文章数 | >10000 | 15000 |
+## 📄 许可证
 
-## 🔒 安全与隐私
-
-- ✅ 所有数据本地存储，支持私有化部署
-- ✅ API密钥加密存储
-- ✅ 支持SSO单点登录
-- ✅ 完整的审计日志
-- ✅ GDPR合规
-
-详见 [SECURITY.md](SECURITY.md)。
-
-## 📄 开源协议
-
-本项目采用 [Apache License 2.0](LICENSE) 协议。
+本项目采用 [Apache License 2.0](LICENSE) 许可证。
 
 ## 🙏 致谢
 
-感谢以下开源项目：
-- [FastAPI](https://fastapi.tiangolo.com/)
-- [Next.js](https://nextjs.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Claude API](https://www.anthropic.com/)
-- [Whisper](https://github.com/openai/whisper)
-
-## 💬 社区支持
-
-- 📧 邮箱：support@attentionsync.io
-- 💬 Discord：[加入我们](https://discord.gg/attentionsync)
-- 🐦 Twitter：[@attentionsync](https://twitter.com/attentionsync)
-- 📖 文档：[docs.attentionsync.io](https://docs.attentionsync.io)
-
-## 🌟 Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=attentionsync/attentionsync&type=Date)](https://star-history.com/#attentionsync/attentionsync&Date)
+感谢所有为这个项目做出贡献的开发者！
 
 ---
 
-<p align="center">
-  Made with ❤️ by the AttentionSync Team
-</p>
+**⭐ 如果这个项目对你有帮助，请给我们一个Star！**
