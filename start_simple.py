@@ -21,17 +21,15 @@ SECRET_KEY=dev-secret-key-change-in-production
         print("✓ Created .env with defaults")
 
 def ensure_deps():
-    """Install only what we actually need - no feature detection nonsense"""
+    """Check core dependencies"""
     try:
         import fastapi
         import uvicorn
         import sqlalchemy
+        return True
     except ImportError:
-        print("Installing core dependencies...")
-        subprocess.run([
-            sys.executable, "-m", "pip", "install", "-q",
-            "fastapi", "uvicorn", "sqlalchemy", "python-dotenv", "pydantic"
-        ])
+        print("Missing core dependencies. Run: make install")
+        return False
 
 def main():
     """Just start the damn thing"""
@@ -39,7 +37,8 @@ def main():
     
     # Step 1: Ensure basics
     ensure_env()
-    ensure_deps()
+    if not ensure_deps():
+        sys.exit(1)
     
     # Step 2: Start the API - no "smart" detection, no "enhanced" versions
     os.chdir("api")
