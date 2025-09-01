@@ -17,6 +17,10 @@ import structlog
 from app.core.config import get_settings
 from app.models.source import Source, SourceType
 from app.models.item import Item
+from app.core.exception_handler import (
+    exception_handler, safe_background_task, 
+    ValidationException, ResourceException
+)
 
 logger = structlog.get_logger()
 
