@@ -1,8 +1,21 @@
 {
   "errors": [],
-  "generated_at": "2025-08-30T03:34:56Z",
+  "generated_at": "2025-09-01T13:11:46Z",
   "metrics": {
-    "./app/__init__.py": {
+    "_totals": {
+      "CONFIDENCE.HIGH": 8,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 3,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 2,
+      "SEVERITY.LOW": 7,
+      "SEVERITY.MEDIUM": 2,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 3614,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app/__init__.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -15,7 +28,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/core/__init__.py": {
+    "app/core/__init__.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -28,7 +41,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/core/config.py": {
+    "app/core/config.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -37,11 +50,11 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 55,
+      "loc": 46,
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/core/database.py": {
+    "app/core/database.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -50,11 +63,11 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 103,
+      "loc": 117,
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/core/exceptions.py": {
+    "app/core/exceptions.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -67,7 +80,33 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/core/redis.py": {
+    "app/core/feature_manager.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 1,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 232,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app/core/performance_tuning.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 232,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app/core/redis.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -80,7 +119,20 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/main.py": {
+    "app/core/smart_deps.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 262,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app/main.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 1,
@@ -89,11 +141,24 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 1,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 85,
+      "loc": 75,
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/models/__init__.py": {
+    "app/main_enhanced.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 247,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app/models/__init__.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -106,7 +171,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/models/base.py": {
+    "app/models/base.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -119,7 +184,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/models/collection.py": {
+    "app/models/collection.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -132,7 +197,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/models/item.py": {
+    "app/models/item.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -145,7 +210,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/models/source.py": {
+    "app/models/source.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -158,7 +223,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/models/user.py": {
+    "app/models/user.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -171,7 +236,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/models/user_preference.py": {
+    "app/models/user_preference.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -184,7 +249,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/routers/__init__.py": {
+    "app/routers/__init__.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -197,7 +262,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/routers/auth.py": {
+    "app/routers/auth.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 1,
@@ -210,7 +275,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/routers/collections.py": {
+    "app/routers/collections.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -223,7 +288,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/routers/daily.py": {
+    "app/routers/daily.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -236,7 +301,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/routers/items.py": {
+    "app/routers/items.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -249,7 +314,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/routers/search.py": {
+    "app/routers/search.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -262,7 +327,20 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/routers/sources.py": {
+    "app/routers/smart_api.py": {
+      "CONFIDENCE.HIGH": 3,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 1,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 227,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app/routers/sources.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -275,7 +353,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/schemas/__init__.py": {
+    "app/schemas/__init__.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -288,7 +366,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/schemas/auth.py": {
+    "app/schemas/auth.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -301,7 +379,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/schemas/item.py": {
+    "app/schemas/item.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -314,7 +392,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/schemas/source.py": {
+    "app/schemas/source.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -327,7 +405,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/services/__init__.py": {
+    "app/services/__init__.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -340,7 +418,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/services/content_fetcher.py": {
+    "app/services/content_fetcher.py": {
       "CONFIDENCE.HIGH": 2,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -353,7 +431,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/services/content_processor.py": {
+    "app/services/content_processor.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -366,7 +444,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/services/personalization.py": {
+    "app/services/personalization.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -379,7 +457,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/utils/__init__.py": {
+    "app/utils/__init__.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -392,7 +470,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "./app/utils/security.py": {
+    "app/utils/security.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -404,27 +482,77 @@
       "loc": 56,
       "nosec": 0,
       "skipped_tests": 0
-    },
-    "_totals": {
-      "CONFIDENCE.HIGH": 2,
-      "CONFIDENCE.LOW": 0,
-      "CONFIDENCE.MEDIUM": 2,
-      "CONFIDENCE.UNDEFINED": 0,
-      "SEVERITY.HIGH": 0,
-      "SEVERITY.LOW": 3,
-      "SEVERITY.MEDIUM": 1,
-      "SEVERITY.UNDEFINED": 0,
-      "loc": 2419,
-      "nosec": 0,
-      "skipped_tests": 0
     }
   },
   "results": [
     {
+      "code": "202                     # Create deterministic hash-based embedding\n203                     hash_val = hashlib.md5(text.encode()).hexdigest()\n204                     # Convert hex to float vector (simplified)\n",
+      "col_offset": 31,
+      "end_col_offset": 57,
+      "filename": "app/core/feature_manager.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 327,
+        "link": "https://cwe.mitre.org/data/definitions/327.html"
+      },
+      "issue_severity": "HIGH",
+      "issue_text": "Use of weak MD5 hash for security. Consider usedforsecurity=False",
+      "line_number": 203,
+      "line_range": [
+        203
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b324_hashlib.html",
+      "test_id": "B324",
+      "test_name": "hashlib"
+    },
+    {
+      "code": "7 import sys\n8 import subprocess\n9 import importlib\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": "app/core/smart_deps.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 8,
+      "line_range": [
+        8
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "216                 logger.info(f\"\ud83d\udce6 Installing {dep.name}...\")\n217                 result = subprocess.run([\n218                     sys.executable, \"-m\", \"pip\", \"install\", \n219                     \"--break-system-packages\", \"--user\", dep.pip_package\n220                 ], capture_output=True, text=True, timeout=300)\n221                 \n",
+      "col_offset": 25,
+      "end_col_offset": 63,
+      "filename": "app/core/smart_deps.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 217,
+      "line_range": [
+        217,
+        218,
+        219,
+        220
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
       "code": "111         \"main:app\",\n112         host=\"0.0.0.0\",\n113         port=8000,\n",
       "col_offset": 13,
       "end_col_offset": 22,
-      "filename": "./app/main.py",
+      "filename": "app/main.py",
       "issue_confidence": "MEDIUM",
       "issue_cwe": {
         "id": 605,
@@ -441,10 +569,30 @@
       "test_name": "hardcoded_bind_all_interfaces"
     },
     {
+      "code": "314     environment = os.getenv(\"ENVIRONMENT\", \"development\")\n315     host = \"127.0.0.1\" if environment == \"development\" else \"0.0.0.0\"\n316     port = int(os.getenv(\"PORT\", \"8000\"))\n",
+      "col_offset": 60,
+      "end_col_offset": 69,
+      "filename": "app/main_enhanced.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 605,
+        "link": "https://cwe.mitre.org/data/definitions/605.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible binding to all interfaces.",
+      "line_number": 315,
+      "line_range": [
+        315
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b104_hardcoded_bind_all_interfaces.html",
+      "test_id": "B104",
+      "test_name": "hardcoded_bind_all_interfaces"
+    },
+    {
       "code": "155     \n156     return Token(\n157         access_token=access_token,\n158         token_type=\"bearer\",\n159         user=UserResponse.from_orm(user)\n160     )\n161 \n",
       "col_offset": 11,
       "end_col_offset": 5,
-      "filename": "./app/routers/auth.py",
+      "filename": "app/routers/auth.py",
       "issue_confidence": "MEDIUM",
       "issue_cwe": {
         "id": 259,
@@ -465,10 +613,73 @@
       "test_name": "hardcoded_password_funcarg"
     },
     {
+      "code": "87     \"\"\"Background task for feature installation\"\"\"\n88     import subprocess\n89     import sys\n",
+      "col_offset": 4,
+      "end_col_offset": 21,
+      "filename": "app/routers/smart_api.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 88,
+      "line_range": [
+        88
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "96         \n97         result = subprocess.run([\n98             sys.executable, \"-m\", \"pip\", \"install\", \n99             \"--break-system-packages\", \"--user\"\n100         ] + pip_packages, capture_output=True, text=True, timeout=600)\n101         \n",
+      "col_offset": 17,
+      "end_col_offset": 70,
+      "filename": "app/routers/smart_api.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 97,
+      "line_range": [
+        97,
+        98,
+        99,
+        100
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "214     \n215     hash_val = hashlib.md5(text.encode()).hexdigest()\n216     # Convert first 16 hex chars to 8 float values\n",
+      "col_offset": 15,
+      "end_col_offset": 41,
+      "filename": "app/routers/smart_api.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 327,
+        "link": "https://cwe.mitre.org/data/definitions/327.html"
+      },
+      "issue_severity": "HIGH",
+      "issue_text": "Use of weak MD5 hash for security. Consider usedforsecurity=False",
+      "line_number": 215,
+      "line_range": [
+        215
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b324_hashlib.html",
+      "test_id": "B324",
+      "test_name": "hashlib"
+    },
+    {
       "code": "147                     published_at = datetime.fromisoformat(date_meta.get(\"content\", \"\").replace(\"Z\", \"+00:00\"))\n148                 except:\n149                     pass\n150             \n",
       "col_offset": 16,
       "end_col_offset": 24,
-      "filename": "./app/services/content_fetcher.py",
+      "filename": "app/services/content_fetcher.py",
       "issue_confidence": "HIGH",
       "issue_cwe": {
         "id": 703,
@@ -489,7 +700,7 @@
       "code": "269                         return datetime(*time_struct[:6])\n270                 except:\n271                     continue\n272         \n",
       "col_offset": 16,
       "end_col_offset": 28,
-      "filename": "./app/services/content_fetcher.py",
+      "filename": "app/services/content_fetcher.py",
       "issue_confidence": "HIGH",
       "issue_cwe": {
         "id": 703,
