@@ -15,6 +15,12 @@ from app.core.feature_manager import (
     get_smart_feature_flags
 )
 from app.core.smart_deps import get_dependency_manager
+from app.core.package_whitelist import validator as package_validator
+from app.core.secure_subprocess import secure_subprocess
+from app.core.exception_handler import (
+    exception_handler, safe_api_endpoint,
+    ValidationException, SecurityException
+)
 
 logger = structlog.get_logger()
 router = APIRouter()
@@ -85,29 +91,49 @@ async def install_feature_group(feature_group: str, background_tasks: Background
 
 async def _install_feature_group_background(feature_group: str, install_command: str):
     """Background task for feature installation"""
-    import subprocess
-    import sys
-    
     logger.info(f"🔄 Installing feature group: {feature_group}")
     
     try:
-        # Parse and execute pip install command
+        # Validate packages against whitelist first
         pip_packages = install_command.replace("pip install ", "").split()
         
-        result = subprocess.run([
-            sys.executable, "-m", "pip", "install", 
-            "--break-system-packages", "--user"
-        ] + pip_packages, capture_output=True, text=True, timeout=600)
+        # Security check: validate all packages
+        is_valid, reason = package_validator.validate_install_command(install_command)
+        if not is_valid:
+            logger.error(f"❌ Package validation failed: {reason}")
+            return {
+                "status": "error",
+                "message": f"Security validation failed: {reason}",
+                "feature_group": feature_group
+            }
         
-        if result.returncode == 0:
+        # Use secure subprocess wrapper for installation
+        success_count = 0
+        failed_packages = []
+        
+        for package in pip_packages:
+            if package.startswith("-"):  # Skip flags
+                continue
+                
+            success, message = secure_subprocess.install_package(package, user=True)
+            if success:
+                success_count += 1
+                logger.info(f"✅ Installed: {package}")
+            else:
+                failed_packages.append(package)
+                logger.error(f"❌ Failed to install: {package}")
+        
+        if success_count > 0 and not failed_packages:
             logger.info(f"✅ Feature group installed: {feature_group}")
             
             # Re-scan dependencies
             dep_manager = get_dependency_manager()
             dep_manager.scan_environment()
             
+        elif failed_packages:
+            logger.error(f"❌ Installation partially failed for: {', '.join(failed_packages)}")
         else:
-            logger.error(f"❌ Installation failed: {feature_group}", error=result.stderr)
+            logger.error(f"❌ No packages installed for: {feature_group}")
     
     except Exception as e:
         logger.error(f"💥 Installation error: {feature_group}", error=str(e))
@@ -212,7 +238,8 @@ def _simple_embeddings(text: str) -> List[float]:
     """Hash-based embeddings - always available"""
     import hashlib
     
-    hash_val = hashlib.md5(text.encode()).hexdigest()
+    # Use SHA-256 for better security and deterministic hashing
+    hash_val = hashlib.sha256(text.encode()).hexdigest()
     # Convert first 16 hex chars to 8 float values
     return [
         float(int(hash_val[i:i+2], 16)) / 255.0 
