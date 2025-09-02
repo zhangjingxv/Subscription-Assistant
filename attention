@@ -1,0 +1,79 @@
+#!/bin/sh
+# AttentionSync - The Unix Way
+# "Controlling complexity is the essence of computer programming" - Kernighan
+
+# Configuration (or use defaults)
+FEEDS="${FEEDS:-$HOME/.feeds}"
+CACHE="${CACHE:-$HOME/.attention}"
+ITEMS="${ITEMS:-10}"
+
+# Ensure directories exist
+mkdir -p "$(dirname "$CACHE")"
+touch "$FEEDS" "$CACHE"
+
+case "$1" in
+    add)
+        echo "$2" >> "$FEEDS"
+        echo "Added: $2"
+        ;;
+    
+    fetch)
+        > "$CACHE.tmp"
+        while IFS= read -r url; do
+            [ -z "$url" ] && continue
+            curl -s "$url" | 
+            grep -oE '<item>.*?</item>' |
+            sed -n 's:.*<title>\(.*\)</title>.*<link>\(.*\)</link>.*:\1||\2:p' |
+            head -n "$ITEMS" >> "$CACHE.tmp"
+        done < "$FEEDS"
+        mv "$CACHE.tmp" "$CACHE"
+        echo "Fetched $(wc -l < "$CACHE") items"
+        ;;
+    
+    show)
+        [ ! -s "$CACHE" ] && echo "No items. Run: $0 fetch" && exit
+        echo "=== Today's Digest ==="
+        cat "$CACHE" | while IFS='||' read -r title url; do
+            printf "\n• %s\n  %s\n" "$title" "$url"
+        done | head -n $((ITEMS * 3))
+        ;;
+    
+    serve)
+        # Minimal web interface using netcat
+        while true; do
+            { echo -e "HTTP/1.1 200 OK\n\n<html><pre>"
+              echo "<h1>AttentionSync</h1>"
+              cat "$CACHE" | while IFS='||' read -r title url; do
+                  echo "• $title"
+                  echo "  <a href='$url'>$url</a>"
+                  echo
+              done
+              echo "</pre></html>"
+            } | nc -l -p 8000 -q 1
+        done
+        ;;
+    
+    *)
+        cat << EOF
+AttentionSync - Minimalist RSS Reader
+
+Usage:
+    $0 add URL     Add RSS feed
+    $0 fetch       Fetch all feeds  
+    $0 show        Show digest
+    $0 serve       Web interface on :8000
+
+Example:
+    $0 add https://news.ycombinator.com/rss
+    $0 fetch
+    $0 show
+
+Files:
+    ~/.feeds       RSS URLs (one per line)
+    ~/.attention   Cached items
+
+Philosophy:
+    "Simplicity is the ultimate sophistication"
+EOF
+        ;;
+esac
