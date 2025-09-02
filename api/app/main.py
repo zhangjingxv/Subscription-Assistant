@@ -68,4 +68,25 @@ app = create_app()
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    import os
+    from app.core.config import get_settings
+    
+    settings = get_settings()
+    
+    # Security: Only bind to localhost in development
+    # In production, use reverse proxy (nginx/caddy)
+    host = "127.0.0.1"  # Never bind to 0.0.0.0 directly
+    port = int(os.environ.get("PORT", 8000))
+    
+    logger.info(f"Starting server on {host}:{port}")
+    logger.info(f"Environment: {settings.environment}")
+    
+    if settings.environment == "production":
+        logger.warning("Production mode: Ensure reverse proxy is configured")
+    
+    uvicorn.run(
+        app, 
+        host=host, 
+        port=port,
+        log_level=settings.log_level.lower()
+    )
