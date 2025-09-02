@@ -1,0 +1,26 @@
+# AttentionSync - The Linus Way
+# "Don't make things more complex than they need to be"
+version: '3'
+
+services:
+  app:
+    image: python:3.11-slim
+    container_name: attentionsync
+    working_dir: /app
+    volumes:
+      - .:/app
+      - ./data:/data
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE=/data/attentionsync.db
+      - API_KEY=${API_KEY:-change-me-in-production}
+      - DEBUG=${DEBUG:-false}
+    command: |
+      sh -c "
+        pip install fastapi uvicorn feedparser httpx &&
+        python simple_start.py
+      "
+    restart: unless-stopped
+
+# That's it. One service. One database file. No complexity.

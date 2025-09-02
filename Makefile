@@ -1,68 +1,58 @@
-# AttentionSync Makefile - Linus style
-# "Make it work, make it right, make it fast - in that order"
+# AttentionSync - Makefile Edition
+# "Make is beautiful because it's declarative" - Linus would appreciate this
 
-.PHONY: help install run test clean dev prod
+FEEDS = ~/.feeds
+CACHE = ~/.attention
+RSS = https://news.ycombinator.com/rss
 
 # Default target
-help:
-	@echo "AttentionSync - Simple commands for simple tasks"
-	@echo ""
-	@echo "  make install  - Install dependencies"
-	@echo "  make run      - Run the application"
-	@echo "  make dev      - Run in development mode"
-	@echo "  make test     - Run tests"
-	@echo "  make clean    - Clean up"
-	@echo "  make prod     - Production deployment"
+all: fetch show
 
-# Install dependencies - minimal by default
-install:
-	pip install --user --break-system-packages -q fastapi uvicorn sqlalchemy python-dotenv pydantic
-	@echo "✓ Core dependencies installed"
-	@echo "Optional: pip install --user openai anthropic redis (for extra features)"
+# Add a feed
+add:
+	@echo "$(RSS)" >> $(FEEDS)
+	@echo "Added: $(RSS)"
 
-# Run the application - simple and direct
-run:
-	@python start_simple.py
+# Fetch all feeds
+fetch:
+	@mkdir -p $$(dirname $(CACHE))
+	@touch $(FEEDS)
+	@> $(CACHE)
+	@while read url; do \
+		curl -s "$$url" 2>/dev/null | \
+		grep -o '<title>[^<]*</title>' | \
+		sed 's/<[^>]*>//g' | \
+		head -5 >> $(CACHE); \
+	done < $(FEEDS)
+	@echo "Fetched $$(wc -l < $(CACHE)) items"
 
-# Development mode - with auto-reload
-dev:
-	cd api && uvicorn app.main_clean:app --reload --host 127.0.0.1 --port 8000
+# Show digest
+show:
+	@echo "=== Daily Digest ==="
+	@cat $(CACHE) 2>/dev/null || echo "No items. Run: make fetch"
 
-# Run tests - when we have them
-test:
-	@echo "Testing..."
-	@python -m pytest tests/ -v 2>/dev/null || echo "No tests yet - that's honest"
-
-# Clean up - remove generated files
+# Clean cache
 clean:
-	find . -type f -name "*.pyc" -delete
-	find . -type d -name "__pycache__" -delete
-	rm -f .coverage
-	rm -rf .pytest_cache
-	rm -f *.db
-	@echo "✓ Cleaned"
+	@rm -f $(CACHE)
+	@echo "Cache cleaned"
 
-# Production - Docker, because it works
-prod:
-	docker-compose up -d
-	@echo "✓ Running in production mode"
+# One-liner for everything
+oneliner:
+	@curl -s $(RSS) | grep -o '<title>[^<]*</title>' | sed 's/<[^>]*>//g' | head -10
 
-# Database operations
-db-init:
-	cd api && python -c "from app.core.db import init_db; import asyncio; asyncio.run(init_db())"
-	@echo "✓ Database initialized"
+# Help
+help:
+	@echo "AttentionSync - RSS in Make"
+	@echo ""
+	@echo "Usage:"
+	@echo "  make add RSS=url  - Add feed"
+	@echo "  make fetch        - Fetch all"  
+	@echo "  make show         - Show digest"
+	@echo "  make clean        - Clear cache"
+	@echo "  make oneliner     - Direct fetch"
+	@echo ""
+	@echo "Example:"
+	@echo "  make add RSS=https://example.com/rss"
+	@echo "  make"
 
-db-reset:
-	rm -f *.db
-	$(MAKE) db-init
-	@echo "✓ Database reset"
-
-# Quick health check
-health:
-	@curl -s http://localhost:8000/health | python -m json.tool || echo "API not running"
-
-# One-line deployment
-deploy: install db-init run
-
-# The Linus way - everything in one command
-all: clean install test run
+.PHONY: all add fetch show clean oneliner help
