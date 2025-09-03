@@ -1,117 +1,57 @@
-# Environment variables
-.env
-.env.local
-.env.production
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# Virtual environments
 venv/
 env/
 ENV/
-env.bak/
-venv.bak/
-.venv/
+.venv
 
-# IDEs
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
-
-# Node.js
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# Next.js
-.next/
-out/
-.vercel
-
-# React
 .DS_Store
-*.tsbuildinfo
 
 # Logs
-logs/
 *.log
-pip-log.txt
-pip-delete-this-directory.txt
+logs/
 
-# Database
-*.db
-*.sqlite3
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Build
+dist/
+build/
+*.egg-info/
+
+# Node (for frontend)
+node_modules/
+.next/
+out/
+.cache/
 
 # Docker
 .dockerignore
 
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# pytest
-.pytest_cache/
-.coverage
-htmlcov/
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Backup files
+# Backups and archives
 *.bak
 *.backup
-*.sql
-
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Temporary files
-tmp/
-temp/
-*.tmp
-*.temp
-
-# Media files (if storing locally)
-media/
-uploads/
-
-# SSL certificates
-*.pem
-*.key
-*.crt
-
-# Monitoring and metrics
-prometheus_data/
-grafana_data/
+*.old
+docs/archive/
