@@ -1,65 +1,60 @@
 """
-Database - Linus style: One connection, one session, no magic.
-"The database is not your friend. It's a necessary evil. Keep it simple."
+Simple database setup
+SQLite for development, PostgreSQL for production
 """
 
-import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
-from contextlib import contextmanager
-import logging
+from sqlalchemy.orm import sessionmaker
 
-logger = logging.getLogger(__name__)
+from app.core.config import get_settings
 
-# Database URL - from env or default to SQLite
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./attentionsync.db")
+settings = get_settings()
 
-# Create engine - once
-engine = create_engine(
-    DATABASE_URL,
-    connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {},
-    pool_pre_ping=True,  # Check connections before using
-    echo=False  # Set to True for SQL debugging
-)
+# Create engine
+if settings.database_url.startswith("sqlite"):
+    # SQLite needs special handling for async
+    engine = create_engine(
+        settings.database_url,
+        connect_args={"check_same_thread": False}
+    )
+else:
+    # PostgreSQL and others
+    engine = create_engine(settings.database_url)
 
-# Session factory - once
+# Session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Base for models - once
+# Base class for models
 Base = declarative_base()
 
 
-@contextmanager
-def get_db() -> Session:
-    """Get a database session - simple context manager"""
+def get_db():
+    """Get database session"""
     db = SessionLocal()
     try:
         yield db
-        db.commit()
-    except Exception:
-        db.rollback()
-        raise
     finally:
         db.close()
 
 
 async def init_db():
-    """Initialize database - create tables if needed"""
-    try:
-        Base.metadata.create_all(bind=engine)
-        logger.info("Database initialized")
-    except Exception as e:
-        logger.error(f"Database initialization failed: {e}")
-        raise
+    """Initialize database - create all tables"""
+    # Import all models to register them
+    from app.models import user, source, item  # noqa
+    
+    # Create tables
+    Base.metadata.create_all(bind=engine)
+    print("Database initialized")
 
 
-def check_db_health() -> bool:
-    """Check if database is accessible"""
+async def test_connection():
+    """Test database connection"""
     try:
-        with engine.connect() as conn:
-            conn.execute("SELECT 1")
+        db = SessionLocal()
+        db.execute("SELECT 1")
+        db.close()
         return True
     except Exception as e:
-        logger.error(f"Database health check failed: {e}")
+        print(f"Database connection failed: {e}")
         return False

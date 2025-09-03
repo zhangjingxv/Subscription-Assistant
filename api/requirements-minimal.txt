@@ -1,0 +1,11 @@
+# AttentionSync Minimal Requirements
+# 仅包含核心运行所需的8个依赖
+
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+sqlalchemy==2.0.23
+feedparser==6.0.10
+pydantic==2.5.1
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-dotenv==1.0.0
