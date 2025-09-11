@@ -149,7 +149,8 @@ class ContentFetcher:
             if date_meta:
                 try:
                     published_at = datetime.fromisoformat(date_meta.get("content", "").replace("Z", "+00:00"))
-                except:
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"Failed to parse published date: {e}")
                     pass
             
             item_data = {
@@ -271,7 +272,8 @@ class ContentFetcher:
                     time_struct = getattr(entry, field + "_parsed")
                     if time_struct:
                         return datetime(*time_struct[:6])
-                except:
+                except (ValueError, OverflowError, OSError) as e:
+                    logger.debug(f"Failed to parse date format {date_format}: {e}")
                     continue
         
         return None

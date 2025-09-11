@@ -22,6 +22,17 @@ services:
       retries: 5
     networks:
       - attentionsync-network
+    # 安全配置
+    security_opt:
+      - no-new-privileges:true
+    read_only: false  # PostgreSQL 需要写入权限
+    user: "999:999"  # postgres 用户
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
 
   # Redis 缓存和队列
   redis:
@@ -39,6 +50,13 @@ services:
       retries: 5
     networks:
       - attentionsync-network
+    # 安全配置
+    security_opt:
+      - no-new-privileges:true
+    read_only: false  # Redis 需要写入权限
+    user: "999:999"  # redis 用户
+    cap_drop:
+      - ALL
 
   # MinIO 对象存储（S3兼容）
   minio:
