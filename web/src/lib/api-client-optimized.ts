@@ -3,7 +3,7 @@
  * 支持请求去重、智能缓存、错误重试等功能
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import toast from 'react-hot-toast';
 
 // 类型定义

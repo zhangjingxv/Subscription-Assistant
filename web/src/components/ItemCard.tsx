@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import {
   ClockIcon,
   TagIcon,
-  ExternalLinkIcon,
   ChevronDownIcon,
   ChevronUpIcon
 } from '@heroicons/react/24/outline';
@@ -34,8 +33,7 @@ export function ItemCard({
   isSaved
 }: ItemCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [imageError, setImageError] = useState(false);
-
+  
   const handleClick = async () => {
     // Record click and open link
     try {
@@ -166,7 +164,7 @@ export function ItemCard({
           onClick={handleClick}
           className="flex items-center space-x-1 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
         >
-          <ExternalLinkIcon className="w-4 h-4" />
+          <span className="inline-block w-4 h-4 align-middle">🔗</span>
           <span className="text-sm">阅读原文</span>
         </button>
 

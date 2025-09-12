@@ -3,8 +3,11 @@
 import { useState } from 'react';
 import { MagnifyingGlassIcon, Cog6ToothIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 import { getStoredUser, isAuthenticated } from '@/lib/api';
+import { useTranslation } from '@/i18n/TranslationProvider';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 export function Header() {
+  const { t, locale } = useTranslation();
   const [user] = useState(getStoredUser());
   const [isLoggedIn] = useState(isAuthenticated());
 
@@ -23,6 +26,7 @@ export function Header() {
 
         {/* Actions */}
         <div className="flex items-center space-x-3">
+          <LanguageSwitcher />
           {isLoggedIn ? (
             <>
               {/* Search button */}
@@ -53,11 +57,11 @@ export function Header() {
             </>
           ) : (
             <div className="flex items-center space-x-2">
-              <a href="/login" className="btn-ghost">
-                登录
+              <a href={`/${locale}/login`} className="btn-ghost">
+                {t('header.login')}
               </a>
-              <a href="/register" className="btn-primary">
-                注册
+              <a href={`/${locale}/register`} className="btn-primary">
+                {t('header.register')}
               </a>
             </div>
           )}
