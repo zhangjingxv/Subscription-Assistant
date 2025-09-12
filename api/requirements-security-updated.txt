@@ -1,0 +1,87 @@
+# AttentionSync 安全更新版本依赖
+# 更新到最新稳定版本，修复已知安全漏洞
+
+# FastAPI 和 Web 框架
+fastapi==0.109.0  # 更新：修复安全漏洞
+uvicorn[standard]==0.27.0  # 更新：性能和安全改进
+gunicorn==21.2.0
+
+# 数据库
+sqlalchemy==2.0.25  # 更新：安全补丁
+alembic==1.13.1
+psycopg2-binary==2.9.9
+asyncpg==0.29.0
+
+# Redis 和缓存
+redis==5.0.1
+aioredis==2.0.1
+
+# 任务队列
+celery==5.3.4
+flower==2.0.1
+
+# HTTP 客户端
+httpx==0.26.0  # 更新：安全修复
+aiohttp==3.9.1
+requests==2.31.0
+
+# 数据处理
+pandas==2.2.0  # 更新：性能和安全改进
+numpy==1.26.3  # 更新：安全补丁
+feedparser==6.0.11  # 更新：解析安全性
+beautifulsoup4==4.12.2
+readability==0.3.1
+python-multipart==0.0.6
+
+# AI 和 ML
+openai==1.12.0  # 更新：API 改进
+anthropic==0.15.0  # 更新：新功能和修复
+# whisper==1.1.10  # 暂时注释，需要特殊处理
+sentence-transformers==2.3.1  # 更新：模型支持
+scikit-learn==1.4.0  # 更新：算法优化
+
+# 图像和媒体处理
+pillow==10.2.0  # 更新：重要安全修复
+# opencv-python==4.8.1.78  # 保持稳定版本
+# pytesseract==0.3.10  # 保持稳定版本
+
+# 文本处理
+jieba==0.42.1
+langdetect==1.0.9
+python-docx==1.1.0
+PyPDF2==3.0.1
+
+# 安全和认证
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+cryptography==42.0.0  # 更新：重要安全修复
+
+# 配置和环境
+python-dotenv==1.0.0
+pydantic==2.6.0  # 更新：性能和功能改进
+pydantic-settings==2.2.0  # 更新：配置管理改进
+
+# 监控和日志
+structlog==24.1.0  # 更新：日志功能增强
+sentry-sdk[fastapi]==1.40.0  # 更新：错误追踪改进
+prometheus-client==0.20.0  # 更新：指标收集优化
+
+# 开发和测试
+pytest==8.0.0  # 更新：测试框架改进
+pytest-asyncio==0.23.4  # 更新：异步测试支持
+pytest-cov==4.1.0
+black==24.1.1  # 更新：代码格式化改进
+isort==5.13.2  # 更新：导入排序优化
+flake8==7.0.0  # 更新：代码检查改进
+mypy==1.8.0  # 更新：类型检查增强
+ruff==0.2.0  # 新增：快速 Python 代码检查器
+
+# 工具类
+python-dateutil==2.8.2
+pytz==2024.1  # 更新：时区数据更新
+click==8.1.7
+rich==13.7.0
+
+# 新增安全工具
+bandit==1.7.6  # 安全漏洞扫描
+safety==3.0.1  # 依赖安全检查
