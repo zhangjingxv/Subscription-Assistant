@@ -42,7 +42,6 @@ const nextConfig = {
   
   // Experimental features
   experimental: {
-    appDir: true,
     optimizeCss: true,
     scrollRestoration: true,
   },

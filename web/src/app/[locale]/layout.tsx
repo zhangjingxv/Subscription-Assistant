@@ -21,8 +21,6 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   return {
     title: 'AttentionSync - 智能信息聚合平台',
     description: '让每个人用3分钟掌握一天的关键信息，永不错过重要机会。',
-    viewport: 'width=device-width, initial-scale=1',
-    themeColor: '#3b82f6',
     alternates: {
       canonical: `${baseUrl}/${params.locale}`,
       languages: alternates,
