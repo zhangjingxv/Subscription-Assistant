@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
+import clsx from 'clsx';
 import {
   HeartIcon,
   BookmarkIcon,
   ShareIcon,
-  ClockIcon,
   EyeSlashIcon
 } from '@heroicons/react/24/outline';
 import {
@@ -22,7 +22,7 @@ import { LoadingSpinner } from './LoadingSpinner';
 
 export function DailyDigest() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [readItems, setReadItems] = useState<Set<number>>(new Set());
+  // removed unused readItems state
   const [likedItems, setLikedItems] = useState<Set<number>>(new Set());
   const [savedItems, setSavedItems] = useState<Set<number>>(new Set());
 
@@ -31,9 +31,12 @@ export function DailyDigest() {
     isLoading,
     error,
     refetch
-  } = useQuery({
+  } = useQuery<ItemSummary[]>({
     queryKey: ['daily-digest'],
-    queryFn: () => apiClient.getDailyDigest({ limit: 10 }),
+    queryFn: async () => {
+      const res = await apiClient.getDailyDigest({ limit: 10 });
+      return res as ItemSummary[];
+    },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
@@ -90,7 +93,6 @@ export function DailyDigest() {
   const handleSkip = async (item: ItemSummary) => {
     try {
       await apiClient.recordDigestFeedback(item.id, 'skip');
-      setReadItems(prev => new Set(prev).add(item.id));
       handleNext();
     } catch (error) {
       toast.error('操作失败');

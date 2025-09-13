@@ -5,12 +5,12 @@ import { motion } from 'framer-motion';
 import {
   ClockIcon,
   TagIcon,
-  ExternalLinkIcon,
   ChevronDownIcon,
   ChevronUpIcon
 } from '@heroicons/react/24/outline';
 import { formatDistanceToNow } from 'date-fns';
-import { zhCN } from 'date-fns/locale';
+import { zhCN, enUS, de, fr, es, ja } from 'date-fns/locale';
+import { useTranslation } from '@/i18n/TranslationProvider';
 import clsx from 'clsx';
 import type { ItemSummary } from '@/types';
 
@@ -33,9 +33,9 @@ export function ItemCard({
   isLiked,
   isSaved
 }: ItemCardProps) {
+  const { locale } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [imageError, setImageError] = useState(false);
-
+  
   const handleClick = async () => {
     // Record click and open link
     try {
@@ -91,7 +91,12 @@ export function ItemCard({
             <span>
               {formatDistanceToNow(new Date(item.published_at), {
                 addSuffix: true,
-                locale: zhCN
+                locale:
+                  locale === 'zh-CN' ? zhCN :
+                  locale === 'de' ? de :
+                  locale === 'fr' ? fr :
+                  locale === 'es' ? es :
+                  locale === 'ja' ? ja : enUS
               })}
             </span>
           </div>
@@ -166,7 +171,7 @@ export function ItemCard({
           onClick={handleClick}
           className="flex items-center space-x-1 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
         >
-          <ExternalLinkIcon className="w-4 h-4" />
+          <span className="inline-block w-4 h-4 align-middle">🔗</span>
           <span className="text-sm">阅读原文</span>
         </button>
 

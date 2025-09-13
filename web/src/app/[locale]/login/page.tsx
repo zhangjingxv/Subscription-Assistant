@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import { apiClient } from '@/lib/api';
 import type { LoginCredentials } from '@/types';
 
-export default function LoginPage() {
+export default function LoginPage({ params }: { params: { locale: string } }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<LoginCredentials>({
@@ -22,7 +22,7 @@ export default function LoginPage() {
     try {
       await apiClient.login(formData);
       toast.success('登录成功！');
-      router.push('/');
+      router.push(`/${params.locale}`);
     } catch (error) {
       console.error('Login failed:', error);
     } finally {
@@ -108,13 +108,12 @@ export default function LoginPage() {
         <div className="text-center">
           <p className="text-gray-600 dark:text-gray-400">
             还没有账户？{' '}
-            <a href="/register" className="text-primary-600 dark:text-primary-400 hover:underline">
+            <a href={`/${params.locale}/register`} className="text-primary-600 dark:text-primary-400 hover:underline">
               立即注册
             </a>
           </p>
         </div>
 
-        {/* Demo credentials hint */}
         <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
           <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
             💡 演示账号
@@ -128,3 +127,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

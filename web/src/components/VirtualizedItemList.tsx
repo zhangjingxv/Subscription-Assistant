@@ -3,10 +3,10 @@
  * 支持大量数据的高性能渲染
  */
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FixedSizeList as List, ListChildComponentProps } from 'react-window';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import InfiniteLoader from 'react-window-infinite-loader';
+// Removed react-window-infinite-loader due to React 18 peer conflict
 import { useInView } from 'react-intersection-observer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ItemCard } from './ItemCard';
@@ -63,11 +63,12 @@ const ListItem = React.memo<ListChildComponentProps<ItemSummary[]>>(
             >
               <ItemCard
                 item={item}
-                compact={true}
                 onLike={() => {/* 处理点赞 */}}
                 onSave={() => {/* 处理保存 */}}
                 onShare={() => {/* 处理分享 */}}
                 onSkip={() => {/* 处理跳过 */}}
+                isLiked={false}
+                isSaved={false}
               />
             </motion.div>
           )}
@@ -89,7 +90,10 @@ export function VirtualizedItemList({
   containerHeight = 600,
   enableInfiniteScroll = true,
 }: VirtualizedItemListProps) {
-  const [scrollOffset, setScrollOffset] = useState(0);
+  // mark onItemAction as referenced (used in Tanstack variant)
+  void onItemAction;
+  // remove unused local state to satisfy lint
+  // const [scrollOffset, setScrollOffset] = useState(0);
 
   // 计算列表项数量（包括加载项）
   const itemCount = hasNextPage ? items.length + 1 : items.length;
@@ -138,38 +142,30 @@ export function VirtualizedItemList({
   );
 
   // 处理滚动事件
-  const handleScroll = useCallback(
-    ({ scrollOffset }: { scrollOffset: number }) => {
-      setScrollOffset(scrollOffset);
-    },
-    []
-  );
+  const handleScroll = useCallback(() => {}, []);
 
   // 无限滚动版本
   if (enableInfiniteScroll && loadNextPage) {
     return (
       <div className="w-full" style={{ height: containerHeight }}>
-        <InfiniteLoader
-          isItemLoaded={isItemLoaded}
+        <List
+          height={containerHeight}
           itemCount={itemCount}
-          loadMoreItems={loadMoreItems}
+          itemSize={itemHeight}
+          itemData={items}
+          onScroll={({ scrollOffset }) => {
+            handleScroll();
+            // trigger load when near end
+            const nearEnd = scrollOffset > itemHeight * (itemCount - 10);
+            if (nearEnd && !isNextPageLoading) {
+              loadMoreItems();
+            }
+          }}
+          overscanCount={5}
+          width="100%"
         >
-          {({ onItemsRendered, ref }) => (
-            <List
-              ref={ref}
-              height={containerHeight}
-              itemCount={itemCount}
-              itemSize={itemHeight}
-              itemData={items}
-              onItemsRendered={onItemsRendered}
-              onScroll={handleScroll}
-              overscanCount={5}
-              width="100%"
-            >
-              {renderItem}
-            </List>
-          )}
-        </InfiniteLoader>
+          {renderItem}
+        </List>
       </div>
     );
   }
@@ -271,11 +267,12 @@ export function VirtualizedItemListTanstack({
                 <div className="px-4 py-2 h-full">
                   <ItemCard
                     item={item}
-                    compact={true}
                     onLike={() => onItemAction?.(item, 'like')}
                     onSave={() => onItemAction?.(item, 'save')}
                     onShare={() => onItemAction?.(item, 'share')}
                     onSkip={() => onItemAction?.(item, 'skip')}
+                    isLiked={false}
+                    isSaved={false}
                   />
                 </div>
               )}
