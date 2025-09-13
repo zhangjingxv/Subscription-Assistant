@@ -393,7 +393,7 @@ class APIClientOptimized {
 
 // 默认配置
 const defaultConfig: APIClientConfig = {
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8050/api/v1',
   timeout: 30000, // 30秒
   cacheTimeout: 5 * 60 * 1000, // 5分钟
   retryConfig: {

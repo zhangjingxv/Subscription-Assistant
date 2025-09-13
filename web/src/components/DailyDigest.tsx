@@ -19,25 +19,39 @@ import { apiClient } from '@/lib/api';
 import type { ItemSummary } from '@/types';
 import { ItemCard } from './ItemCard';
 import { LoadingSpinner } from './LoadingSpinner';
+import { ErrorBoundary } from './ErrorBoundary';
+import { useAPIError } from './APIErrorHandler';
 
 export function DailyDigest() {
   const [currentIndex, setCurrentIndex] = useState(0);
   // removed unused readItems state
   const [likedItems, setLikedItems] = useState<Set<number>>(new Set());
   const [savedItems, setSavedItems] = useState<Set<number>>(new Set());
+  const { error, handleError, clearError } = useAPIError();
 
   const {
     data: digestItems,
     isLoading,
-    error,
+    error: queryError,
     refetch
   } = useQuery<ItemSummary[]>({
     queryKey: ['daily-digest'],
     queryFn: async () => {
-      const res = await apiClient.getDailyDigest({ limit: 10 });
-      return res as ItemSummary[];
+      try {
+        const res = await apiClient.getDailyDigest({ limit: 10 });
+        clearError(); // 清除之前的错误
+        return res as ItemSummary[];
+      } catch (err) {
+        handleError(err);
+        throw err;
+      }
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: (failureCount, error) => {
+      // 自定义重试逻辑
+      if (error?.status === 401) return false; // 认证错误不重试
+      return failureCount < 3;
+    },
   });
 
   const currentItem = digestItems?.[currentIndex];
@@ -76,6 +90,7 @@ export function DailyDigest() {
       setLikedItems(prev => new Set(prev).add(item.id));
       toast.success('已标记为喜欢');
     } catch (error) {
+      handleError(error);
       toast.error('操作失败');
     }
   };
@@ -86,6 +101,7 @@ export function DailyDigest() {
       setSavedItems(prev => new Set(prev).add(item.id));
       toast.success('已保存到收藏夹');
     } catch (error) {
+      handleError(error);
       toast.error('保存失败');
     }
   };
@@ -95,6 +111,7 @@ export function DailyDigest() {
       await apiClient.recordDigestFeedback(item.id, 'skip');
       handleNext();
     } catch (error) {
+      handleError(error);
       toast.error('操作失败');
     }
   };
@@ -115,6 +132,7 @@ export function DailyDigest() {
         toast.success('链接已复制到剪贴板');
       }
     } catch (error) {
+      handleError(error);
       toast.error('分享失败');
     }
   };
@@ -128,13 +146,33 @@ export function DailyDigest() {
     );
   }
 
-  if (error) {
+  if (queryError || error) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-600 dark:text-gray-400 mb-4">加载失败</p>
-        <button onClick={() => refetch()} className="btn-primary">
-          重试
-        </button>
+        <div className="text-6xl mb-4">⚠️</div>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+          加载失败
+        </h3>
+        <p className="text-gray-600 dark:text-gray-400 mb-4">
+          {error?.message || queryError?.message || '无法加载内容，请检查网络连接'}
+        </p>
+        <div className="space-x-4">
+          <button 
+            onClick={() => {
+              clearError();
+              refetch();
+            }} 
+            className="btn-primary"
+          >
+            重试
+          </button>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="btn-secondary"
+          >
+            刷新页面
+          </button>
+        </div>
       </div>
     );
   }
@@ -154,7 +192,26 @@ export function DailyDigest() {
   }
 
   return (
-    <div className="space-y-6">
+    <ErrorBoundary
+      fallback={
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">⚠️</div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+            组件加载失败
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            每日摘要组件遇到了问题，请刷新页面重试
+          </p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="btn-primary"
+          >
+            刷新页面
+          </button>
+        </div>
+      }
+    >
+      <div className="space-y-6">
       {/* Progress bar */}
       <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
         <motion.div
@@ -303,6 +360,7 @@ export function DailyDigest() {
           </p>
         </motion.div>
       )}
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }
