@@ -10,8 +10,6 @@ export const metadata: Metadata = {
   description: '让每个人用3分钟掌握一天的关键信息，永不错过重要机会。',
   keywords: ['信息聚合', 'AI摘要', 'RSS阅读器', '内容管理'],
   authors: [{ name: 'AttentionSync Team' }],
-  viewport: 'width=device-width, initial-scale=1',
-  themeColor: '#3b82f6',
 };
 
 export default function RootLayout({
