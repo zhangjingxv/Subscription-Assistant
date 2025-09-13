@@ -14,8 +14,8 @@ from jose import JWTError, jwt
 import structlog
 
 from app.core.config import get_settings
-from app.core.database import get_db
-from app.core.exceptions import AuthenticationException, ValidationException
+from app.core.db import get_db
+from app.core.exceptions import AuthenticationError, ValidationError
 from app.models.user import User
 from app.schemas.auth import UserCreate, UserLogin, Token, UserResponse
 
@@ -77,18 +77,18 @@ async def get_current_user(
         )
         user_id: int = payload.get("sub")
         if user_id is None:
-            raise AuthenticationException("Invalid token payload")
+            raise AuthenticationError("Invalid token payload")
     except JWTError:
-        raise AuthenticationException("Invalid token")
+        raise AuthenticationError("Invalid token")
     
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
     
     if user is None:
-        raise AuthenticationException("User not found")
+        raise AuthenticationError("User not found")
     
     if not user.is_active:
-        raise AuthenticationException("User account is disabled")
+        raise AuthenticationError("User account is disabled")
     
     return user
 
@@ -102,7 +102,7 @@ async def register(
     # Check if user already exists
     existing_user = await get_user_by_email(db, user_data.email)
     if existing_user:
-        raise ValidationException("Email already registered")
+        raise ValidationError("Email already registered")
     
     # Create new user
     hashed_password = get_password_hash(user_data.password)
@@ -139,10 +139,10 @@ async def login(
     user = await get_user_by_email(db, user_data.email)
     
     if not user or not verify_password(user_data.password, user.hashed_password):
-        raise AuthenticationException("Invalid email or password")
+        raise AuthenticationError("Invalid email or password")
     
     if not user.is_active:
-        raise AuthenticationException("Account is disabled")
+        raise AuthenticationError("Account is disabled")
     
     # Update last login
     user.update_last_login()

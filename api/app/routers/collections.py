@@ -9,8 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 import structlog
 
-from app.core.database import get_db
-from app.core.exceptions import NotFoundException
+from app.core.db import get_db
+from app.core.exceptions import NotFoundError
 from app.models.user import User
 from app.models.collection import Collection
 from app.routers.auth import get_current_user

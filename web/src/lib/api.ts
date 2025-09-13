@@ -20,7 +20,31 @@ export const apiClient = {
     return res;
   },
   async getDailyDigest(params?: any) {
-    return api.getDailyDigest(params);
+    try {
+      const res = await api.getDailyDigest(params);
+      console.log('API Response:', res);
+      // 转换API响应格式以匹配前端期望的格式
+      if (res && res.items) {
+        const transformedItems = res.items.map((item: any) => ({
+          id: item.id,
+          title: item.title,
+          summary: item.content,
+          url: item.url,
+          author: item.source,
+          published_at: item.published_at,
+          importance_score: 0.8,
+          topics: [],
+          source_name: item.source
+        }));
+        console.log('Transformed items:', transformedItems);
+        return transformedItems;
+      }
+      console.log('No items found in response');
+      return [];
+    } catch (error) {
+      console.error('Error in getDailyDigest:', error);
+      throw error;
+    }
   },
   async recordDigestFeedback(itemId: string | number, action: string) {
     return api.recordDigestFeedback(String(itemId), action);

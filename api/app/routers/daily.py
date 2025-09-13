@@ -11,7 +11,7 @@ from sqlalchemy import select, and_, func, desc
 from sqlalchemy.orm import selectinload
 import structlog
 
-from app.core.database import get_db
+from app.core.db import get_db
 from app.models.user import User
 from app.models.item import Item
 from app.models.source import Source
@@ -163,7 +163,7 @@ async def record_digest_feedback(
     item = result.scalar_one_or_none()
     
     if not item:
-        raise NotFoundException("Item not found")
+        raise NotFoundError("Item not found")
     
     # Record interaction based on feedback type
     if feedback_type == "like":

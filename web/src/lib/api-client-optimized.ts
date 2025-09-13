@@ -186,6 +186,7 @@ class APIClientOptimized {
   }
 
   private handleError(error: any) {
+    console.error('API Error:', error);
     if (error.response) {
       // 服务器响应错误
       const message = error.response.data?.error?.message || '请求失败';
@@ -215,9 +216,11 @@ class APIClientOptimized {
       }
     } else if (error.request) {
       // 网络错误
+      console.error('Network error:', error.request);
       toast.error('网络连接失败，请检查网络设置');
     } else {
       // 其他错误
+      console.error('Unknown error:', error);
       toast.error('发生未知错误');
     }
   }

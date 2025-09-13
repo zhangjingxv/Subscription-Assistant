@@ -8,7 +8,7 @@ from typing import Optional
 from sqlalchemy import Column, DateTime, Integer, func
 from sqlalchemy.ext.declarative import declared_attr
 
-from app.core.database import Base
+from app.core.db import Base
 
 
 class TimestampMixin:

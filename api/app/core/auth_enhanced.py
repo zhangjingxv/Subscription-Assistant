@@ -20,7 +20,7 @@ from jose import JWTError, jwt
 import structlog
 
 from app.core.config import get_settings
-from app.core.database import get_db
+from app.core.db import get_db
 from app.core.exceptions import AuthenticationError, ValidationError
 from app.models.user import User
 from app.core.cache import cache_manager

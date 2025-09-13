@@ -10,8 +10,8 @@ from sqlalchemy import select, and_, or_, desc
 from sqlalchemy.orm import selectinload
 import structlog
 
-from app.core.database import get_db
-from app.core.exceptions import NotFoundException
+from app.core.db import get_db
+from app.core.exceptions import NotFoundError
 from app.models.user import User
 from app.models.item import Item
 from app.models.source import Source
@@ -92,7 +92,7 @@ async def get_item(
     item = result.scalar_one_or_none()
     
     if not item:
-        raise NotFoundException("Item not found")
+        raise NotFoundError("Item not found")
     
     # Increment view count
     item.increment_view()
@@ -117,7 +117,7 @@ async def record_click(
     item = result.scalar_one_or_none()
     
     if not item:
-        raise NotFoundException("Item not found")
+        raise NotFoundError("Item not found")
     
     # Increment click count
     item.increment_click()
@@ -144,7 +144,7 @@ async def record_share(
     item = result.scalar_one_or_none()
     
     if not item:
-        raise NotFoundException("Item not found")
+        raise NotFoundError("Item not found")
     
     # Increment share count
     item.increment_share()

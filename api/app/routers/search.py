@@ -10,7 +10,7 @@ from sqlalchemy import select, and_, or_, func, desc
 from sqlalchemy.orm import selectinload
 import structlog
 
-from app.core.database import get_db
+from app.core.db import get_db
 from app.models.user import User
 from app.models.item import Item
 from app.models.source import Source

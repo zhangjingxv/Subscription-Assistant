@@ -9,8 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 import structlog
 
-from app.core.database import get_db
-from app.core.exceptions import NotFoundException, ValidationException
+from app.core.db import get_db
+from app.core.exceptions import NotFoundError, ValidationError
 from app.models.user import User
 from app.models.source import Source, SourceStatus
 from app.routers.auth import get_current_user
@@ -58,7 +58,7 @@ async def create_source(
     existing_source = result.scalar_one_or_none()
     
     if existing_source:
-        raise ValidationException("Source with this URL already exists")
+        raise ValidationError("Source with this URL already exists")
     
     # Create new source
     source = Source(
@@ -102,7 +102,7 @@ async def get_source(
     source = result.scalar_one_or_none()
     
     if not source:
-        raise NotFoundException("Source not found")
+        raise NotFoundError("Source not found")
     
     return SourceResponse.from_orm(source)
 
@@ -123,7 +123,7 @@ async def update_source(
     source = result.scalar_one_or_none()
     
     if not source:
-        raise NotFoundException("Source not found")
+        raise NotFoundError("Source not found")
     
     # Update fields
     update_data = source_data.dict(exclude_unset=True)
@@ -154,7 +154,7 @@ async def delete_source(
     source = result.scalar_one_or_none()
     
     if not source:
-        raise NotFoundException("Source not found")
+        raise NotFoundError("Source not found")
     
     await db.delete(source)
     await db.commit()
@@ -179,7 +179,7 @@ async def pause_source(
     source = result.scalar_one_or_none()
     
     if not source:
-        raise NotFoundException("Source not found")
+        raise NotFoundError("Source not found")
     
     source.status = SourceStatus.PAUSED
     await db.commit()
@@ -204,7 +204,7 @@ async def resume_source(
     source = result.scalar_one_or_none()
     
     if not source:
-        raise NotFoundException("Source not found")
+        raise NotFoundError("Source not found")
     
     source.status = SourceStatus.ACTIVE
     await db.commit()
