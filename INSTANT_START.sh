@@ -18,7 +18,8 @@ check_python() {
     echo -n "检查Python版本... "
     if command -v python3 &> /dev/null; then
         PYTHON_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')
-        if [ $(echo "$PYTHON_VERSION >= 3.8" | bc) -eq 1 ]; then
+        # 使用Python进行版本比较，更可靠
+        if python3 -c "import sys; exit(0 if sys.version_info >= (3, 8) else 1)"; then
             echo -e "${GREEN}✓${NC} Python $PYTHON_VERSION"
             return 0
         else
@@ -35,14 +36,22 @@ check_python() {
 setup_venv() {
     echo -n "创建虚拟环境... "
     if [ ! -d "venv" ]; then
-        python3 -m venv venv
-        echo -e "${GREEN}✓${NC}"
+        # 尝试使用python3-venv，如果失败则跳过虚拟环境
+        if python3 -m venv venv 2>/dev/null; then
+            echo -e "${GREEN}✓${NC}"
+        else
+            echo -e "${YELLOW}跳过虚拟环境（系统不支持）${NC}"
+            echo "直接使用系统Python环境"
+            return 0
+        fi
     else
         echo -e "${YELLOW}已存在${NC}"
     fi
     
-    # 激活虚拟环境
-    source venv/bin/activate
+    # 激活虚拟环境（如果存在）
+    if [ -f "venv/bin/activate" ]; then
+        source venv/bin/activate
+    fi
 }
 
 # 安装最小依赖
@@ -88,30 +97,34 @@ EOF
 # 初始化数据库
 init_database() {
     echo -n "初始化数据库... "
+    cd api
     python3 << EOF
 import sys
-sys.path.append('./api')
+import os
+sys.path.insert(0, os.getcwd())
 from app.core.db import init_db
 import asyncio
 asyncio.run(init_db())
 print("数据库初始化成功")
 EOF
+    cd ..
     echo -e "${GREEN}✓${NC}"
 }
 
 # 创建测试用户
 create_test_user() {
     echo "创建测试用户..."
+    cd api
     python3 << EOF
 import sys
-sys.path.append('./api')
+import os
+sys.path.insert(0, os.getcwd())
 from app.core.db import get_db
 from app.models.user import User
 from app.core.security import get_password_hash
-import asyncio
 
-async def create_user():
-    async for db in get_db():
+def create_user():
+    for db in get_db():
         # 检查用户是否存在
         existing = db.query(User).filter(User.email == "test@example.com").first()
         if not existing:
@@ -129,23 +142,25 @@ async def create_user():
             print("✓ 测试用户已存在")
         break
 
-asyncio.run(create_user())
+create_user()
 EOF
+    cd ..
 }
 
 # 添加示例RSS源
 add_sample_sources() {
     echo "添加示例RSS源..."
+    cd api
     python3 << EOF
 import sys
-sys.path.append('./api')
+import os
+sys.path.insert(0, os.getcwd())
 from app.core.db import get_db
 from app.models.source import Source
 from app.models.user import User
-import asyncio
 
-async def add_sources():
-    async for db in get_db():
+def add_sources():
+    for db in get_db():
         # 获取测试用户
         user = db.query(User).filter(User.email == "test@example.com").first()
         if user:
@@ -176,8 +191,9 @@ async def add_sources():
             db.commit()
         break
 
-asyncio.run(add_sources())
+add_sources()
 EOF
+    cd ..
 }
 
 # 启动服务

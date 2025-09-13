@@ -38,7 +38,7 @@ def get_db():
         db.close()
 
 
-async def init_db():
+def init_db():
     """Initialize database - create all tables"""
     # Import all models to register them
     from app.models import user, source, item  # noqa
@@ -46,6 +46,11 @@ async def init_db():
     # Create tables
     Base.metadata.create_all(bind=engine)
     print("Database initialized")
+
+
+async def init_db_async():
+    """Async version for FastAPI"""
+    init_db()
 
 
 async def test_connection():

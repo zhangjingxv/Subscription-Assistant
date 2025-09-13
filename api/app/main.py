@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 import logging
 
 from app.core.config import get_settings
-from app.core.db import init_db
+from app.core.db import init_db_async
 
 # Simple, direct logging - no JSON nonsense in development
 logging.basicConfig(
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """Startup and shutdown - nothing fancy"""
     logger.info("Starting AttentionSync API")
-    await init_db()
+    await init_db_async()
     yield
     logger.info("Shutting down")
 

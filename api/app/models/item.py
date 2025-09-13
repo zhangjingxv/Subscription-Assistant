@@ -58,7 +58,7 @@ class Item(BaseModel):
     source = relationship("Source", back_populates="items")
     
     # Self-referential relationship for duplicates
-    duplicate_of = relationship("Item", remote_side=[id], backref="duplicates")
+    duplicate_of = relationship("Item", remote_side="Item.id", backref="duplicates")
     
     # Indexes for performance
     __table_args__ = (
