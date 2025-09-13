@@ -73,7 +73,8 @@ class APIClientOptimized {
     this.axiosInstance.interceptors.response.use(
       (response) => {
         // 记录请求时间
-        const duration = Date.now() - response.config.metadata?.startTime;
+        const start = response.config.metadata?.startTime ?? Date.now();
+        const duration = Date.now() - start;
         if (duration > 1000) {
           console.warn(`Slow API request: ${response.config.url} took ${duration}ms`);
         }

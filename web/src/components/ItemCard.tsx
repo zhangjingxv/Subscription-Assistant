@@ -9,7 +9,8 @@ import {
   ChevronUpIcon
 } from '@heroicons/react/24/outline';
 import { formatDistanceToNow } from 'date-fns';
-import { zhCN } from 'date-fns/locale';
+import { zhCN, enUS, de, fr, es, ja } from 'date-fns/locale';
+import { useTranslation } from '@/i18n/TranslationProvider';
 import clsx from 'clsx';
 import type { ItemSummary } from '@/types';
 
@@ -32,6 +33,7 @@ export function ItemCard({
   isLiked,
   isSaved
 }: ItemCardProps) {
+  const { locale } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   
   const handleClick = async () => {
@@ -89,7 +91,12 @@ export function ItemCard({
             <span>
               {formatDistanceToNow(new Date(item.published_at), {
                 addSuffix: true,
-                locale: zhCN
+                locale:
+                  locale === 'zh-CN' ? zhCN :
+                  locale === 'de' ? de :
+                  locale === 'fr' ? fr :
+                  locale === 'es' ? es :
+                  locale === 'ja' ? ja : enUS
               })}
             </span>
           </div>

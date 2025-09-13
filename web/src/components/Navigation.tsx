@@ -16,35 +16,36 @@ import {
 } from '@heroicons/react/24/solid';
 import Link from 'next/link';
 import clsx from 'clsx';
+import { useTranslation } from '@/i18n/TranslationProvider';
 
 const navigation = [
   {
     name: '今日',
-    href: '/',
+    slug: '',
     icon: HomeIcon,
     iconActive: HomeIconSolid,
   },
   {
     name: '发现',
-    href: '/search',
+    slug: 'search',
     icon: MagnifyingGlassIcon,
     iconActive: MagnifyingGlassIconSolid,
   },
   {
     name: '订阅',
-    href: '/sources',
+    slug: 'sources',
     icon: RssIcon,
     iconActive: RssIconSolid,
   },
   {
     name: '收藏',
-    href: '/collections',
+    slug: 'collections',
     icon: BookmarkIcon,
     iconActive: BookmarkIconSolid,
   },
   {
     name: '统计',
-    href: '/stats',
+    slug: 'stats',
     icon: ChartBarIcon,
     iconActive: ChartBarIconSolid,
   },
@@ -52,19 +53,22 @@ const navigation = [
 
 export function Navigation() {
   const pathname = usePathname();
+  const { locale } = useTranslation();
+  const base = `/${locale}`;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 safe-bottom">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="flex items-center justify-around py-2">
           {navigation.map((item) => {
-            const isActive = pathname === item.href;
+            const href = item.slug ? `${base}/${item.slug}` : base;
+            const isActive = pathname === href || pathname.startsWith(`${href}/`);
             const Icon = isActive ? item.iconActive : item.icon;
             
             return (
               <Link
                 key={item.name}
-                href={item.href}
+                href={href}
                 className={clsx(
                   'flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-colors duration-200',
                   isActive

@@ -3,7 +3,9 @@
 import React, { createContext, useContext, useMemo } from 'react';
 import type { Locale } from './config';
 
-export type Messages = Record<string, string | Messages>;
+export interface Messages {
+  [key: string]: string | Messages;
+}
 
 type TranslationContextValue = {
   locale: Locale | string;

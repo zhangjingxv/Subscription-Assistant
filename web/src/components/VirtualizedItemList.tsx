@@ -63,11 +63,12 @@ const ListItem = React.memo<ListChildComponentProps<ItemSummary[]>>(
             >
               <ItemCard
                 item={item}
-                compact={true}
                 onLike={() => {/* 处理点赞 */}}
                 onSave={() => {/* 处理保存 */}}
                 onShare={() => {/* 处理分享 */}}
                 onSkip={() => {/* 处理跳过 */}}
+                isLiked={false}
+                isSaved={false}
               />
             </motion.div>
           )}
@@ -266,11 +267,12 @@ export function VirtualizedItemListTanstack({
                 <div className="px-4 py-2 h-full">
                   <ItemCard
                     item={item}
-                    compact={true}
                     onLike={() => onItemAction?.(item, 'like')}
                     onSave={() => onItemAction?.(item, 'save')}
                     onShare={() => onItemAction?.(item, 'share')}
                     onSkip={() => onItemAction?.(item, 'skip')}
+                    isLiked={false}
+                    isSaved={false}
                   />
                 </div>
               )}
