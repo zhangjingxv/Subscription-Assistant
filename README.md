@@ -187,6 +187,6 @@ MIT License
 
 > "Simplicity is the ultimate sophistication." - Leonardo da Vinci
 
-**最后更新**: 2025-01-13  
+**最后更新**: 2025-09-13  
 **当前版本**: 1.0.0  
-**维护者**: AttentionSync Team
+**维护者**: xv
